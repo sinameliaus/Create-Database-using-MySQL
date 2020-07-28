@@ -1,1 +1,49 @@
+SELECT country.name AS Country, city.name AS CapCity, city.Population
+FROM country, city
+WHERE city.id = country.Capital
+ORDER BY city.Population
+LIMIT 10
+
+
+SELECT * 
+FROM world.country
+WHERE country.Continent = 'Asia'
+ORDER BY country.Region, country.name
+
+SELECT city.CountryCode, SUM(city.Population) AS CountryPopulation
+FROM world.city
+GROUP BY city.CountryCode
+
+SELECT countrylanguage.CountryCode, countrylanguage.Language AS MinorLang, countrylanguage.Percentage
+FROM world.countrylanguage
+WHERE countrylanguage.Percentage BETWEEN 5 AND 10
+AND countrylanguage.CountryCode IN (SELECT countrylanguage.CountryCode 
+FROM world.countrylanguage
+WHERE countrylanguage.Language = 'English'
+AND countrylanguage.Percentage > 80)
+
+SELECT country.name, COUNT(city.id) AS CityCount
+FROM world.city, country
+WHERE city.countrycode = country.code
+AND city.CountryCode IN (SELECT country.Code
+FROM world.country
+WHERE country.IndepYear IS NULL)
+GROUP BY city.CountryCode
+HAVING CityCount > 2
+ORDER BY country.name
+
+SELECT 
+    country.name, covidstats.reportDate, covidstats.confirmedCases, covidstats.deaths
+FROM
+    covidstats, country
+WHERE covidstats.countrycode = country.code
+    AND covidstats.CountryCode IN ((SELECT countrylanguage.CountryCode 
+FROM countrylanguage, country
+WHERE country.code = countrylanguage.CountryCode
+AND country.Continent = 'Europe'
+AND countrylanguage.CountryCode NOT IN (SELECT countrylanguage.CountryCode
+FROM world.countrylanguage
+WHERE countrylanguage.Language = 'English')
+GROUP BY countrylanguage.CountryCode))
+ORDER BY covidstats.CountryCode, covidstats.reportDate
 
